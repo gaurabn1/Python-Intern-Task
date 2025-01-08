@@ -1,5 +1,5 @@
 from flask import Flask
-from extensions import db, bcrypt, jwt, session
+from extensions import db, bcrypt, jwt
 from config import Config
 from blog.routes import blog_blueprint
 from auth.routes import auth_blueprint
@@ -12,7 +12,6 @@ def create_app():
 
     # Initialize extensions
     db.init_app(app)
-    session.init_app(app)
     jwt.init_app(app)
     bcrypt.init_app(app)
 
