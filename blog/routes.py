@@ -7,19 +7,29 @@ from schemas import BlogSchema
 
 blog_blueprint = Blueprint("blog", __name__)
 
-@blog_blueprint.route("/blogs", methods=['GET'])
+@blog_blueprint.route("/", methods=['GET'])
 def get_blogs():
     '''
     This endpoint returns all blogs in the system
     - Method: GET
     '''
-    blogs = Blog.query.all()
+    page = request.args.get("page", 1, type=int)
+    per_page=request.args.get("per_page", 10, type=int)
+
+    blogs = Blog.query.paginate(page=page, per_page=per_page, error_out=False)
 
     # Get all blogs
-    if blogs:
+    if blogs.items:
         blog_schema = BlogSchema(many=True)
-        blog_data = blog_schema.dump(blogs)
-        return jsonify({"message": "All Blogs!", "blogs": blog_data}), 200
+        blog_data = blog_schema.dump(blogs.items)
+        return jsonify({
+            "message": "Paginated Blogs!",
+            "blogs": blog_data,
+            "total": blogs.total,
+            "page": blogs.page,
+            "pages": blogs.pages,
+            "per_page": blogs.per_page
+        }), 200
     return jsonify({"message": "No Blogs Found!"}), 200
 
 
